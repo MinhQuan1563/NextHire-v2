@@ -1,0 +1,70 @@
+## Ignore Visual Studio user-specific files
+.vscode/
+*.user
+*.suo
+
+## Ignore build results
+bin/
+obj/
+out/
+build/
+
+## Ignore ABP-specific folders
+*.db
+*.db-shm
+*.db-wal
+*.log
+*.log.*
+
+## Ignore test results
+TestResults/
+*.coverage
+*.coveragexml
+
+## Ignore NuGet packages
+*.nupkg
+*.snupkg
+packages/
+*.nuspec
+
+## Ignore Rider-specific files
+.idea/
+*.sln.iml
+
+## Ignore by-pattern
+**/bin/
+**/obj/
+**/node_modules/
+
+## Ignore files from Yarn / NPM
+node_modules/
+dist/
+build/
+
+## Ignore .NET secrets and environment config
+appsettings.Production.json
+appsettings.Development.json
+appsettings.Staging.json
+secrets.json
+.env
+.env.*
+
+## Ignore ABP CLI generated files
+*.db
+*.sqlite
+*.bak
+
+## Ignore logs
+logs/
+*.log
+
+## Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+## Ignore local tool configs
+*.vs/
+.vs/
+.vscode/
+*.swp
+*.tmp
