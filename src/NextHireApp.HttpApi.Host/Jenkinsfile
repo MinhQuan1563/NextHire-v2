@@ -13,12 +13,18 @@ pipeline {
     }
 
     stages {
-        // stage('Check .NET and Docker') {
-        //     steps {
-        //         sh 'dotnet --version || echo ".NET SDK chưa được cài"'
-        //         sh 'docker --version || echo "Docker CLI chưa được cài"'
-        //     }
-        // }
+        stage('Check .NET and Docker') {
+            steps {
+                sh 'dotnet --version || echo ".NET SDK chưa được cài"'
+                sh 'docker --version || echo "Docker CLI chưa được cài"'
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
 
         stage('Environment Check') {
             steps {
