@@ -1,10 +1,12 @@
 pipeline {
-    agent {
-        docker {
-            image 'mcr.microsoft.com/dotnet/sdk:9.0'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    // agent {
+    //     docker {
+    //         image 'mcr.microsoft.com/dotnet/sdk:9.0'
+    //         args '-v /var/run/docker.sock:/var/run/docker.sock'
+    //     }
+    // }
+
+    agent any
 
     environment {
         EMAIL = 'dominhquan15623@example.com'
@@ -13,6 +15,13 @@ pipeline {
     }
 
     stages {
+        stage('Check .NET and Docker') {
+            steps {
+                sh 'dotnet --version || echo ".NET SDK chưa được cài"'
+                sh 'docker --version || echo "Docker CLI chưa được cài"'
+            }
+        }
+
         stage('Environment Check') {
             steps {
                 script {
@@ -164,7 +173,7 @@ pipeline {
                     
                     Check Jenkins for more details.
                     """,
-                    to: "${EMAIL}"
+                    to: "${env.EMAIL}"
                 )
             }
         }
