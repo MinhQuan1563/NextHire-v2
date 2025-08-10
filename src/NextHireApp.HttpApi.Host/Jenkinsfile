@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'mcr.microsoft.com/dotnet/sdk:9.0'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }   
+    agent any
 
     environment {
         EMAIL = 'dominhquan15623@example.com'
@@ -13,26 +8,28 @@ pipeline {
     }
 
     stages {
-        stage('Setup Environment') {
+        stage('Clean Workspace') {
             steps {
-                sh '''
-                    apt-get update
-                    apt-get install -y git curl
-                '''
-            }
-        }
-
-        stage('Check .NET and Docker') {
-            steps {
-                sh 'dotnet --version || echo ".NET SDK chưa được cài"'
-                sh 'docker --version || echo "Docker CLI chưa được cài"'
-                sh 'git --version || echo "Git chưa được cài"'
+                cleanWs()
             }
         }
 
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Debug Info') {
+            steps {
+                sh '''
+                    echo "=== Current Directory ==="
+                    pwd
+                    echo "=== Directory Listing ==="
+                    ls -al
+                    echo "=== Git Status ==="
+                    git status || echo "Not a git repository"
+                '''
             }
         }
 
@@ -113,19 +110,12 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        # Stop existing staging container if running
                         docker stop nexthire-staging || true
                         docker rm nexthire-staging || true
-                        
-                        # Run new staging container
                         docker run -d --name nexthire-staging -p 8080:80 \
                             -e ASPNETCORE_ENVIRONMENT=Staging \
                             ${DOCKER_IMAGE}
-                        
-                        # Wait for container to be ready
                         sleep 10
-                        
-                        # Health check
                         curl -f http://localhost:8080/health || echo "Health check failed"
                     '''
                 }
@@ -137,8 +127,6 @@ pipeline {
                 script {
                     sh '''
                         echo "Running integration tests on staging environment..."
-                        # Add your integration test commands here
-                        # Example: curl tests, API tests, etc.
                         curl -f http://localhost:8080/ || echo "Basic connectivity test failed"
                     '''
                 }
@@ -152,19 +140,12 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        # Stop existing production container if running
                         docker stop nexthire-production || true
                         docker rm nexthire-production || true
-                        
-                        # Run new production container
                         docker run -d --name nexthire-production -p 80:80 \
                             -e ASPNETCORE_ENVIRONMENT=Production \
                             ${DOCKER_IMAGE}
-                        
-                        # Wait for container to be ready
                         sleep 15
-                        
-                        # Health check
                         curl -f http://localhost/ || echo "Production health check failed"
                     '''
                 }
