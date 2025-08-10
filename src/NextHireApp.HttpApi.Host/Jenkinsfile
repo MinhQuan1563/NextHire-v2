@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'mcr.microsoft.com/dotnet/sdk:9.0'
-            args '-v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/git:/usr/bin/git -v /usr/bin/docker:/usr/bin/docker'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
     }   
 
@@ -13,10 +13,20 @@ pipeline {
     }
 
     stages {
+        stage('Setup Environment') {
+            steps {
+                sh '''
+                    apt-get update
+                    apt-get install -y git curl
+                '''
+            }
+        }
+
         stage('Check .NET and Docker') {
             steps {
                 sh 'dotnet --version || echo ".NET SDK chưa được cài"'
                 sh 'docker --version || echo "Docker CLI chưa được cài"'
+                sh 'git --version || echo "Git chưa được cài"'
             }
         }
 
