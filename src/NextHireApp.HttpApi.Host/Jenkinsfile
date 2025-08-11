@@ -29,9 +29,6 @@ pipeline {
                     ls -al
                     echo "=== Git Status ==="
                     git status || echo "Not a git repository"
-                    sh 'ls -al'
-                    sh 'cat Jenkinsfile || echo "Jenkinsfile not found"'
-                    sh 'git rev-parse --is-inside-work-tree || echo "Not a git repo"'
                 '''
             }
         }
