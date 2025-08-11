@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'mcr.microsoft.com/dotnet/sdk:9.0'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
+            args '-v //./pipe/docker_engine://./pipe/docker_engine'
         }
     }
 
@@ -43,6 +43,7 @@ pipeline {
                 script {
                     sh 'dotnet --version'
                     sh 'dotnet --info'
+                    sh 'docker version'
                 }
             }
         }
