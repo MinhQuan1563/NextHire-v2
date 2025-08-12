@@ -1,11 +1,4 @@
 pipeline {
-    // agent {
-    //     docker {
-    //         image 'mcr.microsoft.com/dotnet/sdk:9.0'
-    //         args '-v //./pipe/docker_engine://./pipe/docker_engine'
-    //     }
-    // }
-
     agent any
 
     environment {
@@ -15,37 +8,15 @@ pipeline {
     }
 
     stages {
-        stage('Clean Workspace') {
-            steps {
-                cleanWs()
-            }
-        }
-
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Debug Info') {
-            steps {
-                sh '''
-                    echo "=== Current Directory ==="
-                    pwd
-                    echo "=== Directory Listing ==="
-                    ls -al
-                    echo "=== Git Status ==="
-                    git status || echo "Not a git repository"
-                '''
-            }
-        }
-
         stage('Environment Check') {
             steps {
                 script {
-                    sh 'dotnet --version'
-                    sh 'dotnet --info'
-                    sh 'docker version'
+                    '''
+                        echo "=== .NET version ==="
+                        dotnet --version
+                        echo "=== Docker version ==="
+                        docker version
+                    '''
                 }
             }
         }
