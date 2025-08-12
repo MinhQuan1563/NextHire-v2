@@ -1,10 +1,12 @@
 pipeline {
-    agent {
-        docker {
-            image 'mcr.microsoft.com/dotnet/sdk:9.0'
-            args '-v //./pipe/docker_engine://./pipe/docker_engine'
-        }
-    }
+    // agent {
+    //     docker {
+    //         image 'mcr.microsoft.com/dotnet/sdk:9.0'
+    //         args '-v //./pipe/docker_engine://./pipe/docker_engine'
+    //     }
+    // }
+
+    agent any
 
     environment {
         EMAIL = 'dominhquan15623@example.com'
