@@ -9,7 +9,7 @@ pipeline {
     agent any
 
     environment {
-        EMAIL = 'dominhquan15623@example.com'
+        EMAIL = 'dominhquan15623@gmail.com'
         DOTNET_CLI_TELEMETRY_OPTOUT = '1'
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
     }
