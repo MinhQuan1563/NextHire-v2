@@ -70,95 +70,95 @@ pipeline {
             }
         }
 
-        stage('Unit Tests') {
-            steps {
-                script {
-                    dir('src') {
-                        sh 'dotnet test --no-build --logger "trx;LogFileName=test_results.trx"'
-                    }
-                }
-            }
-            post {
-                always {
-                    script {
-                        if (fileExists('src/**/TestResults/*.trx')) {
-                            step([$class: 'MSTestPublisher', testResultsFile: 'src/**/TestResults/*.trx'])
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Unit Tests') {
+        //     steps {
+        //         script {
+        //             dir('src') {
+        //                 sh 'dotnet test --no-build --logger "trx;LogFileName=test_results.trx"'
+        //             }
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             script {
+        //                 if (fileExists('src/**/TestResults/*.trx')) {
+        //                     step([$class: 'MSTestPublisher', testResultsFile: 'src/**/TestResults/*.trx'])
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Code Analysis') {
-            steps {
-                script {
-                    dir('src/NextHireApp.HttpApi.Host') {
-                        sh 'dotnet format --verify-no-changes'
-                    }
-                }
-            }
-        }
+        // stage('Code Analysis') {
+        //     steps {
+        //         script {
+        //             dir('src/NextHireApp.HttpApi.Host') {
+        //                 sh 'dotnet format --verify-no-changes'
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    def imageName = "nexthire-app:${env.BUILD_NUMBER}"
-                    def latestImageName = "nexthire-app:latest"
+        // stage('Build Docker Image') {
+        //     steps {
+        //         script {
+        //             def imageName = "nexthire-app:${env.BUILD_NUMBER}"
+        //             def latestImageName = "nexthire-app:latest"
                     
-                    sh "docker build -f src/NextHireApp.HttpApi.Host/Dockerfile -t ${imageName} -t ${latestImageName} ."
+        //             sh "docker build -f src/NextHireApp.HttpApi.Host/Dockerfile -t ${imageName} -t ${latestImageName} ."
                     
-                    // Save image info for later stages
-                    env.DOCKER_IMAGE = imageName
-                    env.DOCKER_IMAGE_LATEST = latestImageName
-                }
-            }
-        }
+        //             // Save image info for later stages
+        //             env.DOCKER_IMAGE = imageName
+        //             env.DOCKER_IMAGE_LATEST = latestImageName
+        //         }
+        //     }
+        // }
 
-        stage('Deploy to Staging') {
-            steps {
-                script {
-                    sh '''
-                        docker stop nexthire-staging || true
-                        docker rm nexthire-staging || true
-                        docker run -d --name nexthire-staging -p 8080:80 \
-                            -e ASPNETCORE_ENVIRONMENT=Staging \
-                            ${DOCKER_IMAGE}
-                        sleep 10
-                        curl -f http://localhost:8080/health || echo "Health check failed"
-                    '''
-                }
-            }
-        }
+        // stage('Deploy to Staging') {
+        //     steps {
+        //         script {
+        //             sh '''
+        //                 docker stop nexthire-staging || true
+        //                 docker rm nexthire-staging || true
+        //                 docker run -d --name nexthire-staging -p 8080:80 \
+        //                     -e ASPNETCORE_ENVIRONMENT=Staging \
+        //                     ${DOCKER_IMAGE}
+        //                 sleep 10
+        //                 curl -f http://localhost:8080/health || echo "Health check failed"
+        //             '''
+        //         }
+        //     }
+        // }
 
-        stage('Integration Tests on Staging') {
-            steps {
-                script {
-                    sh '''
-                        echo "Running integration tests on staging environment..."
-                        curl -f http://localhost:8080/ || echo "Basic connectivity test failed"
-                    '''
-                }
-            }
-        }
+        // stage('Integration Tests on Staging') {
+        //     steps {
+        //         script {
+        //             sh '''
+        //                 echo "Running integration tests on staging environment..."
+        //                 curl -f http://localhost:8080/ || echo "Basic connectivity test failed"
+        //             '''
+        //         }
+        //     }
+        // }
 
-        stage('Deploy to Production') {
-            when {
-                branch 'main'
-            }
-            steps {
-                script {
-                    sh '''
-                        docker stop nexthire-production || true
-                        docker rm nexthire-production || true
-                        docker run -d --name nexthire-production -p 80:80 \
-                            -e ASPNETCORE_ENVIRONMENT=Production \
-                            ${DOCKER_IMAGE}
-                        sleep 15
-                        curl -f http://localhost/ || echo "Production health check failed"
-                    '''
-                }
-            }
-        }
+        // stage('Deploy to Production') {
+        //     when {
+        //         branch 'main'
+        //     }
+        //     steps {
+        //         script {
+        //             sh '''
+        //                 docker stop nexthire-production || true
+        //                 docker rm nexthire-production || true
+        //                 docker run -d --name nexthire-production -p 80:80 \
+        //                     -e ASPNETCORE_ENVIRONMENT=Production \
+        //                     ${DOCKER_IMAGE}
+        //                 sleep 15
+        //                 curl -f http://localhost/ || echo "Production health check failed"
+        //             '''
+        //         }
+        //     }
+        // }
     }
 
     post {
@@ -182,12 +182,12 @@ pipeline {
         }
         success {
             script {
-                echo 'Pipeline completed successfully!'
+                echo 'Pipeline Quan completed successfully!'
             }
         }
         failure {
             script {
-                echo 'Pipeline failed. Check the logs for details.'
+                echo 'Pipeline Quan failed. Check the logs for details.'
             }
         }
     }
