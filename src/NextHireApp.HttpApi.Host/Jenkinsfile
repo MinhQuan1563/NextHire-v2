@@ -36,6 +36,9 @@ pipeline {
         }
 
         stage('Build') {
+            when {
+                branch 'main'
+            }
             steps {
                 script {
                     dir('src/NextHireApp.HttpApi.Host') {
