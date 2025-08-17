@@ -42,15 +42,14 @@ pipeline {
                 script {
                 def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
                 def commitAuthor  = sh(script: "git log -1 --pretty=%an", returnStdout: true).trim()
-                def commitHash    = sh(script: "git rev-parse HEAD", returnStdout: true).trim()   // dùng full hash cho chắc
+                def commitHash    = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
                 def githubLink    = "${env.GITHUB_REPO}/commit/${commitHash}"
 
                 // Nội dung message dạng 1 string, để xuống dòng bình thường:
                 def message = """✅ **Build thành công trên branch ${env.BRANCH_NAME ?: 'main'}!**
-            - Người commit: ${commitAuthor}
-            - Commit: ${commitMessage}
-            - Link GitHub: ${githubLink}
-            - Jenkins Build: ${env.BUILD_URL}"""
+            • Người commit: ${commitAuthor}
+            • Commit: ${commitMessage}
+            • Link GitHub: ${githubLink}"""
 
                 // Tạo JSON đúng chuẩn bằng Groovy
                 def payload = groovy.json.JsonOutput.toJson([content: message])
