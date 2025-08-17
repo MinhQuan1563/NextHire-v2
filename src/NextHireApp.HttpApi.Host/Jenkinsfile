@@ -1,4 +1,4 @@
-pipeline {
+﻿pipeline {
     agent any
 
     triggers {
@@ -9,28 +9,26 @@ pipeline {
         EMAIL = 'dominhquan15623@gmail.com'
         DOTNET_CLI_TELEMETRY_OPTOUT = '1'
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
+        DISCORD_WEBHOOK = 'https://discordapp.com/api/webhooks/1406570184067649639/E51ZVnDsszvap0ibUCeUNmADZ3ciMyVybS1IYT4RfmknX9RkSClh5JmMuA-JLkBGBB4T'
+        GITHUB_REPO = 'https://github.com/MinhQuan1563/NextHire-v2'
     }
 
     stages {
         stage('Environment Check') {
             steps {
-                script {
-                    '''
-                        echo "=== .NET version ==="
-                        dotnet --version
-                        echo "=== Docker version ==="
-                        docker version
-                    '''
-                }
+                sh '''
+                    echo "=== .NET version ==="
+                    dotnet --version
+                    echo "=== Docker version ==="
+                    docker version
+                '''
             }
         }
         
         stage('Restore') {
             steps {
-                script {
-                    dir('src/NextHireApp.HttpApi.Host') {
-                        sh 'dotnet restore'
-                    }
+                dir('src/NextHireApp.HttpApi.Host') {
+                    sh 'dotnet restore'
                 }
             }
         }
@@ -40,103 +38,40 @@ pipeline {
                 branch 'main'
             }
             steps {
-                script {
-                    dir('src/NextHireApp.HttpApi.Host') {
-                        sh 'dotnet build --no-restore -c Release'
-                    }
+                dir('src/NextHireApp.HttpApi.Host') {
+                    sh 'dotnet build --no-restore -c Release'
                 }
             }
         }
 
-        // stage('Unit Tests') {
-        //     steps {
-        //         script {
-        //             dir('src') {
-        //                 sh 'dotnet test --no-build --logger "trx;LogFileName=test_results.trx"'
-        //             }
-        //         }
-        //     }
-        //     post {
-        //         always {
-        //             script {
-        //                 if (fileExists('src/**/TestResults/*.trx')) {
-        //                     step([$class: 'MSTestPublisher', testResultsFile: 'src/**/TestResults/*.trx'])
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Notify Discord') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+                    def commitAuthor  = sh(script: "git log -1 --pretty=%an", returnStdout: true).trim()
+                    def commitHash    = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    def githubLink    = "${env.GITHUB_REPO}/commit/${commitHash}"
 
-        // stage('Code Analysis') {
-        //     steps {
-        //         script {
-        //             dir('src/NextHireApp.HttpApi.Host') {
-        //                 sh 'dotnet format --verify-no-changes'
-        //             }
-        //         }
-        //     }
-        // }
+                    def message = """
+✅ **Build thành công trên branch main!**
+- Người commit: ${commitAuthor}
+- Commit: ${commitMessage}
+- Link GitHub: ${githubLink}
+- Jenkins Build: ${env.BUILD_URL}
+"""
 
-        // stage('Build Docker Image') {
-        //     steps {
-        //         script {
-        //             def imageName = "nexthire-app:${env.BUILD_NUMBER}"
-        //             def latestImageName = "nexthire-app:latest"
-                    
-        //             sh "docker build -f src/NextHireApp.HttpApi.Host/Dockerfile -t ${imageName} -t ${latestImageName} ."
-                    
-        //             // Save image info for later stages
-        //             env.DOCKER_IMAGE = imageName
-        //             env.DOCKER_IMAGE_LATEST = latestImageName
-        //         }
-        //     }
-        // }
-
-        // stage('Deploy to Staging') {
-        //     steps {
-        //         script {
-        //             sh '''
-        //                 docker stop nexthire-staging || true
-        //                 docker rm nexthire-staging || true
-        //                 docker run -d --name nexthire-staging -p 8080:80 \
-        //                     -e ASPNETCORE_ENVIRONMENT=Staging \
-        //                     ${DOCKER_IMAGE}
-        //                 sleep 10
-        //                 curl -f http://localhost:8080/health || echo "Health check failed"
-        //             '''
-        //         }
-        //     }
-        // }
-
-        // stage('Integration Tests on Staging') {
-        //     steps {
-        //         script {
-        //             sh '''
-        //                 echo "Running integration tests on staging environment..."
-        //                 curl -f http://localhost:8080/ || echo "Basic connectivity test failed"
-        //             '''
-        //         }
-        //     }
-        // }
-
-        // stage('Deploy to Production') {
-        //     when {
-        //         branch 'main'
-        //     }
-        //     steps {
-        //         script {
-        //             sh '''
-        //                 docker stop nexthire-production || true
-        //                 docker rm nexthire-production || true
-        //                 docker run -d --name nexthire-production -p 80:80 \
-        //                     -e ASPNETCORE_ENVIRONMENT=Production \
-        //                     ${DOCKER_IMAGE}
-        //                 sleep 15
-        //                 curl -f http://localhost/ || echo "Production health check failed"
-        //             '''
-        //         }
-        //     }
-        // }
+                    sh """
+                        curl -H "Content-Type: application/json" \
+                             -X POST \
+                             -d '{"content": "${message}"}' \
+                             ${env.DISCORD_WEBHOOK}
+                    """
+                }
+            }
+        }
     }
 
     post {
