@@ -1,18 +1,16 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-env
-
+﻿# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-
 COPY . .
-COPY NuGet.Config ./
+RUN dotnet restore
+RUN dotnet publish -c Release -o /app
 
-RUN dotnet restore "src/NextHireApp.HttpApi.Host/NextHireApp.HttpApi.Host.csproj" --configfile NuGet.Config -nowarn:msb3202,nu1503 --force
-
-RUN dotnet publish "src/NextHireApp.HttpApi.Host/NextHireApp.HttpApi.Host.csproj" --no-restore -c Release -o /out
-
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 ENV TZ=Asia/Ho_Chi_Minh
 WORKDIR /app
-
-COPY --from=build-env /out /app
-
+COPY --from=build /app .
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
 ENTRYPOINT ["dotnet", "NextHireApp.HttpApi.Host.dll"]
+
