@@ -40,28 +40,24 @@ pipeline {
         stage('Notify Discord') {
             steps {
                 script {
-                    def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
-                    def commitAuthor  = sh(script: "git log -1 --pretty=%an", returnStdout: true).trim()
-                    def commitHash    = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-                    def githubLink    = "${env.GITHUB_REPO}/commit/${commitHash}"
+                def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+                def commitAuthor  = sh(script: "git log -1 --pretty=%an", returnStdout: true).trim()
+                def commitHash    = sh(script: "git rev-parse HEAD", returnStdout: true).trim()   // dùng full hash cho chắc
+                def githubLink    = "${env.GITHUB_REPO}/commit/${commitHash}"
 
-                    def message = """
-✅ **Build thành công trên branch main!**
-- Người commit: ${commitAuthor}
-- Commit: ${commitMessage}
-- Link GitHub: ${githubLink}
-- Jenkins Build: ${env.BUILD_URL}
-"""
+                // Nội dung message dạng 1 string, để xuống dòng bình thường:
+                def message = """✅ **Build thành công trên branch ${env.BRANCH_NAME ?: 'main'}!**
+            - Người commit: ${commitAuthor}
+            - Commit: ${commitMessage}
+            - Link GitHub: ${githubLink}
+            - Jenkins Build: ${env.BUILD_URL}"""
 
-                    sh '''
-                    curl -H "Content-Type: application/json" \
-                        -X POST \
-                        -d '{
-                            "content": "✅ **Build thành công trên branch main!**\n- Người commit: ${commitAuthor}\n- Commit: ${commitMessage}\n- Link GitHub: ${githubLink}\n- Jenkins Build: ${env.BUILD_URL}"
-                        }' \
-                        https://discordapp.com/api/webhooks/1406570184067649639/E51ZVnDsszvap0ibUCeUNmADZ3ciMyVybS1IYT4RfmknX9RkSClh5JmMuA-JLkBGBB4T
-                    '''
+                // Tạo JSON đúng chuẩn bằng Groovy
+                def payload = groovy.json.JsonOutput.toJson([content: message])
 
+                // Ghi ra file và curl bằng --data @file để khỏi phải escape
+                writeFile file: 'discord_payload.json', text: payload
+                sh "curl -sS -H 'Content-Type: application/json' -X POST --data @discord_payload.json '${env.DISCORD_WEBHOOK}'"
                 }
             }
         }
