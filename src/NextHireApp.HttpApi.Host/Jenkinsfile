@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    triggers {
-        githubPush()
-    }
-
     environment {
         EMAIL = 'dominhquan15623@gmail.com'
         DOTNET_CLI_TELEMETRY_OPTOUT = '1'
@@ -34,9 +30,6 @@ pipeline {
         }
 
         stage('Build') {
-            when {
-                branch 'main'
-            }
             steps {
                 dir('src/NextHireApp.HttpApi.Host') {
                     sh 'dotnet build --no-restore -c Release'
@@ -45,9 +38,6 @@ pipeline {
         }
 
         stage('Notify Discord') {
-            when {
-                branch 'main'
-            }
             steps {
                 script {
                     def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
