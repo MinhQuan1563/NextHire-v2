@@ -1,10 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
+using System;
+using System.Threading.Tasks;
 
 namespace NextHireApp;
 
@@ -29,6 +30,8 @@ public class Program
         {
             Log.Information("Starting NextHireApp.HttpApi.Host.");
             var builder = WebApplication.CreateBuilder(args);
+            var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+            builder.WebHost.UseUrls($"http://*:{port}");
             builder.Host.AddAppSettingsSecretsJson()
                 .UseAutofac()
                 .UseSerilog();
@@ -36,6 +39,7 @@ public class Program
             var app = builder.Build();
             await app.InitializeApplicationAsync();
             await app.RunAsync();
+            
             return 0;
         }
         catch (Exception ex)

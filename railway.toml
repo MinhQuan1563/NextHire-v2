@@ -1,0 +1,7 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "./src/NextHireApp.HttpApi.Host/Dockerfile"
+
+[deploy]
+startCommand = "dotnet NextHireApp.HttpApi.Host.dll"
+restartPolicyType = "never"
