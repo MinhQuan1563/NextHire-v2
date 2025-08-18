@@ -4,14 +4,50 @@
 
 This is a layered startup solution based on [Domain Driven Design (DDD)](https://abp.io/docs/latest/framework/architecture/domain-driven-design) practises. All the fundamental ABP modules are already installed. 
 
+## Quick Start Guide
+
+📺 **Xem video hướng dẫn chi tiết**: https://www.youtube.com/watch?v=ZAJwVLaTnOM
+
+📖 **Đọc hướng dẫn chi tiết**:
+- [English Tutorial](TUTORIAL.md) - Complete step-by-step guide in English
+- [Hướng dẫn tiếng Việt](TUTORIAL-VI.md) - Hướng dẫn từng bước chi tiết bằng tiếng Việt
+
+🚀 **Quick Setup**:
+```bash
+# Linux/macOS
+./setup.sh
+
+# Windows
+setup.bat
+```
+
 ### Pre-requirements
 
-* [.NET 9.0+ SDK](https://dotnet.microsoft.com/download/dotnet)
+* [.NET 9.0+ SDK](https://dotnet.microsoft.com/download/dotnet) ⚠️ **Important**: Project requires .NET 9.0 SDK
 * [Node v20.11+](https://nodejs.org/en)
 
 ### Configurations
 
 The solution comes with a default configuration that works out of the box. However, you may consider to change the following configuration before running your solution:
+
+#### ⚠️ .NET Version Compatibility
+
+This project targets **.NET 9.0**. If you encounter build errors related to .NET version:
+
+1. **Install .NET 9.0 SDK**:
+   - Download from: https://dotnet.microsoft.com/download/dotnet/9.0
+   - Or use command: `winget install Microsoft.DotNet.SDK.9`
+
+2. **Verify installation**:
+   ```bash
+   dotnet --version
+   # Should show 9.x.x
+   ```
+
+3. **If you must use .NET 8.0**, you can downgrade the project:
+   - Edit all `.csproj` files
+   - Change `<TargetFramework>net9.0</TargetFramework>` to `<TargetFramework>net8.0</TargetFramework>`
+   - Update Docker files to use .NET 8.0 images
 
 
 ### Before running the application
