@@ -20,7 +20,14 @@ pipeline {
                 '''
             }
         }
-        
+
+        // Fix lỗi "dubious ownership"
+        stage('Prepare Git') {
+            steps {
+                sh "git config --global --add safe.directory '${env.WORKSPACE}'"
+            }
+        }
+
         stage('Restore') {
             steps {
                 dir('src/NextHireApp.HttpApi.Host') {
@@ -45,16 +52,16 @@ pipeline {
                 def commitHash    = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
                 def githubLink    = "${env.GITHUB_REPO}/commit/${commitHash}"
 
-                // Nội dung message dạng 1 string, để xuống dòng bình thường:
+                // Tạo nội dung message cho Discord
                 def message = """✅ **Build thành công trên branch ${env.BRANCH_NAME ?: 'main'}!**
             • Người commit: ${commitAuthor}
             • Commit: ${commitMessage}
             • Link GitHub: ${githubLink}"""
 
-                // Tạo JSON đúng chuẩn bằng Groovy
+                // Tạo payload cho Discord
                 def payload = groovy.json.JsonOutput.toJson([content: message])
 
-                // Ghi ra file và curl bằng --data @file để khỏi phải escape
+                // Ghi payload vào file JSON
                 writeFile file: 'discord_payload.json', text: payload
                 sh "curl -sS -H 'Content-Type: application/json' -X POST --data @discord_payload.json '${env.DISCORD_WEBHOOK}'"
                 }
