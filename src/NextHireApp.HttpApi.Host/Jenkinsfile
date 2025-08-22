@@ -11,9 +11,20 @@ pipeline {
 
     stages {
         stage('Checkout') {
+            // steps {
+            //     deleteDir()
+            //     git branch: 'main', url: 'https://github.com/MinhQuan1563/NextHire-v2.git'
+            // }
             steps {
-                deleteDir()
-                git branch: 'main', url: 'https://github.com/MinhQuan1563/NextHire-v2.git'
+                git scm
+            }
+        }
+
+        stage('Validate') {
+            steps {
+                script {
+                    sh 'ls -la'
+                }
             }
         }
 
