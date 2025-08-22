@@ -10,6 +10,22 @@ pipeline {
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: "${env.GITHUB_REPO}"]]
+                ])
+            }
+        }
+
         stage('Environment Check') {
             steps {
                 sh '''
