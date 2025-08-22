@@ -10,6 +10,13 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                deleteDir()
+                git branch: 'main', url: 'https://github.com/MinhQuan1563/NextHire-v2.git'
+            }
+        }
+
         stage('Environment Check') {
             steps {
                 sh '''
