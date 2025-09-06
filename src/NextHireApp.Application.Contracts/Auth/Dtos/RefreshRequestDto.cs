@@ -1,4 +1,4 @@
-﻿namespace NextHireApp.Accounts.Dtos
+﻿namespace NextHireApp.Auth.Dtos
 {
     public class RefreshRequestDto
     {
