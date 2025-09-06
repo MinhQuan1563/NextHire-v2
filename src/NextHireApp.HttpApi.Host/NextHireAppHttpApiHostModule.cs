@@ -1,17 +1,24 @@
+﻿using Hangfire;
+using Hangfire.Redis.StackExchange;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NextHireApp.EntityFrameworkCore;
+using NextHireApp.Hangfire;
 using NextHireApp.MultiTenancy;
 using OpenIddict.Validation.AspNetCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using Volo.Abp;
 using Volo.Abp.Account;
 using Volo.Abp.Account.Web;
@@ -24,6 +31,8 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
+using Volo.Abp.BlobStoring;
+using Volo.Abp.BlobStoring.FileSystem;
 using Volo.Abp.Modularity;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
@@ -71,6 +80,66 @@ public class NextHireAppHttpApiHostModule : AbpModule
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
         ConfigureNoMvc(context);
+
+        // JWT
+        context.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                var auth = configuration.GetSection("AuthServer");
+                var securityKey = auth["SecurityKey"];
+
+                if (string.IsNullOrEmpty(securityKey))
+                {
+                    throw new InvalidOperationException("The SecurityKey configuration is missing or empty.");
+                }
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = auth["Issuer"],
+                    ValidAudience = auth["Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(securityKey)
+                    ),
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                // Check blacklist after validate
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async ctx =>
+                    {
+                        var bl = ctx.HttpContext.RequestServices.GetRequiredService<ITokenBlacklistService>();
+                        var jti = ctx.Principal?.FindFirstValue(JwtRegisteredClaimNames.Jti);
+                        if (jti != null && await bl.IsBlacklistedAsync(jti))
+                        {
+                            ctx.Fail("Token is blacklisted");
+                        }
+                    }
+                };
+            });
+
+        // Redis
+        context.Services.AddStackExchangeRedisCache(o =>
+            o.Configuration = configuration.GetSection("Redis")["Configuration"]);
+
+        // Blob (avatar)
+        Configure<AbpBlobStoringOptions>(opts =>
+        {
+            opts.Containers.Configure<AvatarContainer>(c =>
+            {
+                c.UseFileSystem(fs => { fs.BasePath = configuration["BlobStoring:FileSystem:BasePath"]; });
+            });
+        });
+
+        // Hangfire
+        context.Services.AddHangfire(cfg =>
+        {
+            var redis = configuration.GetSection("Redis")["Configuration"];
+            cfg.UseSimpleAssemblyNameTypeSerializer()
+               .UseRecommendedSerializerSettings()
+               .UseRedisStorage(redis);
+        });
+        context.Services.AddHangfireServer();
 
         #region Localization
         #endregion
@@ -230,6 +299,17 @@ public class NextHireAppHttpApiHostModule : AbpModule
             c.OAuthScopes("NextHireApp");
             c.DefaultModelsExpandDepth(-1);
         });
+
+        // Hangfire dashboard
+        app.UseHangfireDashboard("/hangfire", new DashboardOptions
+        {
+            Authorization = new[] { new HangfireBasicAuthFilter(context.ServiceProvider) }
+        });
+
+        // Đăng job định kỳ
+        var recurring = context.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+        recurring.AddOrUpdate<TokenCleanupJob>("TokenCleanupJob",
+            job => job.RunAsync(), Cron.Daily);
 
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
