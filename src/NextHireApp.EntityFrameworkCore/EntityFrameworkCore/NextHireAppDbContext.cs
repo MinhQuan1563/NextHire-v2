@@ -1,9 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NextHireApp.AppUsers;
+using NextHireApp.CvViews;
+using NextHireApp.JobApplications;
+using NextHireApp.Jobs;
+using NextHireApp.UserCvs;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
+using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.EntityFrameworkCore;
@@ -53,6 +59,14 @@ public class NextHireAppDbContext :
 
     #endregion
 
+    #region NextHireAppp
+    public DbSet<AppUser> AppUsers { get; set; }
+    public DbSet<UserCv> UserCvs { get; set; }
+    public DbSet<CvView> CvViews { get; set; }
+    public DbSet<JobApplication> JobApplications { get; set; }
+    public DbSet<Job> Jobs { get; set; }
+    #endregion
+
     public NextHireAppDbContext(DbContextOptions<NextHireAppDbContext> options)
         : base(options)
     {
@@ -73,14 +87,9 @@ public class NextHireAppDbContext :
         builder.ConfigureOpenIddict();
         builder.ConfigureFeatureManagement();
         builder.ConfigureTenantManagement();
-
         /* Configure your own tables/entities inside here */
-
-        //builder.Entity<YourEntity>(b =>
-        //{
-        //    b.ToTable(NextHireAppConsts.DbTablePrefix + "YourEntities", NextHireAppConsts.DbSchema);
-        //    b.ConfigureByConvention(); //auto configure for the base class props
-        //    //...
-        //});
+        builder.ConfigureAppUsers();
+        builder.ConfigureCvAndJobApplication();
+        builder.ConfigureJobs();
     }
 }
