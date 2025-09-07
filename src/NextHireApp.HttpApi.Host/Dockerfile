@@ -1,18 +1,31 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-env
+﻿# # stage build
+# FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+# WORKDIR /src
 
-WORKDIR /src
+# # sao chép toàn bộ mã nguồn và khôi phục package
+# COPY . .
+# RUN dotnet restore "src/NextHireApp.HttpApi.Host/NextHireApp.HttpApi.Host.csproj"
 
-COPY . .
-COPY NuGet.Config ./
+# # publish ứng dụng ra thư mục /app/publish
+# RUN dotnet publish "src/NextHireApp.HttpApi.Host/NextHireApp.HttpApi.Host.csproj" \
+#      -c Release -o /app/publish
 
-RUN dotnet restore "src/NextHireApp.HttpApi.Host/NextHireApp.HttpApi.Host.csproj" --configfile NuGet.Config -nowarn:msb3202,nu1503 --force
+# # stage runtime
+# FROM mcr.microsoft.com/dotnet/aspnet:9.0
+# ENV TZ=Asia/Ho_Chi_Minh
+# WORKDIR /app
+# COPY --from=build /app/publish .
+# # cổng sẽ được lấy từ biến môi trường ASPNETCORE_URLS hoặc PORT
+# ENTRYPOINT ["dotnet", "NextHireApp.HttpApi.Host.dll"]
 
-RUN dotnet publish "src/NextHireApp.HttpApi.Host/NextHireApp.HttpApi.Host.csproj" --no-restore -c Release -o /out
+FROM jksnexthireacr.azurecr.io/jenkins:jdk21
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
-ENV TZ=Asia/Ho_Chi_Minh
-WORKDIR /app
+USER root
 
-COPY --from=build-env /out /app
+RUN mkdir -p /var/jenkins_home/workspace \
+    && chown -R jenkins:jenkins /var/jenkins_home/workspace
 
-ENTRYPOINT ["dotnet", "NextHireApp.HttpApi.Host.dll"]
+RUN git config --global --add safe.directory /var/jenkins_home/workspace \
+    && git config --global --add safe.directory /var/jenkins_home/workspace/MyNextHire@script
+
+USER jenkins
