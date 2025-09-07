@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
-using Volo.Abp.Uow;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
@@ -12,8 +10,6 @@ using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
-using Volo.Abp.EntityFrameworkCore.DependencyInjection;
-using Volo.Abp.Identity;
 
 namespace NextHireApp.EntityFrameworkCore;
 
@@ -41,6 +37,12 @@ public class NextHireAppEntityFrameworkCoreModule : AbpModule
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         context.Services.AddAbpDbContext<NextHireAppDbContext>(options =>
+        {
+            /* Remove "includeAllEntities: true" to create
+             * default repositories only for aggregate roots */
+            options.AddDefaultRepositories(includeAllEntities: true);
+        });
+        context.Services.AddAbpDbContext<NextHireAppReadDbContext>(options =>
         {
             /* Remove "includeAllEntities: true" to create
              * default repositories only for aggregate roots */

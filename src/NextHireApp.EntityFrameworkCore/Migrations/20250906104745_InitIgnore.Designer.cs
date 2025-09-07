@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NextHireApp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace NextHireApp.Migrations
 {
     [DbContext(typeof(NextHireAppDbContext))]
-    partial class NextHireAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250906104745_InitIgnore")]
+    partial class InitIgnore
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -23,55 +26,6 @@ namespace NextHireApp.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("NextHireApp.Model.AppUser", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AvatarUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Education")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Experience")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Gender")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PersonalProjects")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PortfolioUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SavedJobs")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Skills")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserCode")
-                        .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserCode")
-                        .IsUnique();
-
-                    b.ToTable("AppUser", (string)null);
-                });
 
             modelBuilder.Entity("NextHireApp.Model.CVTemplate", b =>
                 {
@@ -122,11 +76,13 @@ namespace NextHireApp.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("CompanyVersion")
                         .HasColumnType("int");
@@ -151,19 +107,20 @@ namespace NextHireApp.Migrations
 
                     b.Property<string>("TaxCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("UserCode")
                         .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Website")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CompanyId");
 
-                    b.HasIndex("UserCode");
+                    b.HasIndex("TaxCode")
+                        .IsUnique();
 
                     b.ToTable("Companies", (string)null);
                 });
@@ -177,18 +134,15 @@ namespace NextHireApp.Migrations
                     b.Property<DateTime>("ViewedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("ViewedCvId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("ViewedUserCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(12)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ViewerCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ViewId");
-
-                    b.HasIndex("ViewedCvId");
-
-                    b.HasIndex("ViewedUserCode");
 
                     b.ToTable("CvViews", (string)null);
                 });
@@ -371,17 +325,14 @@ namespace NextHireApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CvFile")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("JobApplicateVersion")
-                        .HasMaxLength(256)
                         .HasColumnType("int");
 
                     b.Property<string>("JobCode")
                         .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiledDate")
                         .HasColumnType("datetime2");
@@ -391,22 +342,14 @@ namespace NextHireApp.Migrations
 
                     b.Property<string>("UserCode")
                         .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ApplicationId");
 
                     b.HasIndex("ApplicationCode")
-                        .IsUnique()
-                        .HasDatabaseName("IX_JobApplications_ApplicationCode");
+                        .IsUnique();
 
-                    b.HasIndex("JobCode");
-
-                    b.HasIndex("UserCode", "JobCode")
-                        .IsUnique()
-                        .HasDatabaseName("IX_JobApplications_User_Job");
-
-                    b.ToTable("AppJobApplications", (string)null);
+                    b.ToTable("JobApplications", (string)null);
                 });
 
             modelBuilder.Entity("NextHireApp.Model.Message", b =>
@@ -592,27 +535,17 @@ namespace NextHireApp.Migrations
 
                     b.Property<string>("CvName")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FileCv")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("bit");
-
                     b.Property<string>("UserCode")
                         .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
-
-                    b.Property<int>("Version")
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CvId");
-
-                    b.HasIndex("UserCode");
 
                     b.ToTable("UserCVs", (string)null);
                 });
@@ -787,34 +720,6 @@ namespace NextHireApp.Migrations
                     b.HasIndex("TenantId", "ServiceName", "MethodName", "ExecutionTime");
 
                     b.ToTable("AbpAuditLogActions", (string)null);
-                });
-
-            modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLogExcelFile", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<string>("FileName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
-                        .HasColumnName("FileName");
-
-                    b.Property<Guid?>("TenantId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("TenantId");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AbpAuditLogExcelFiles", (string)null);
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.EntityChange", b =>
@@ -1552,6 +1457,8 @@ namespace NextHireApp.Migrations
                     b.HasIndex("UserName");
 
                     b.ToTable("AbpUsers", (string)null);
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("Volo.Abp.Identity.IdentityUserClaim", b =>
@@ -2397,57 +2304,51 @@ namespace NextHireApp.Migrations
                     b.ToTable("AbpTenantConnectionStrings", (string)null);
                 });
 
-            modelBuilder.Entity("NextHireApp.Model.CvView", b =>
+            modelBuilder.Entity("NextHireApp.Model.AppUser", b =>
                 {
-                    b.HasOne("NextHireApp.Model.UserCV", "Cv")
-                        .WithMany()
-                        .HasForeignKey("ViewedCvId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                    b.HasBaseType("Volo.Abp.Identity.IdentityUser");
 
-                    b.HasOne("NextHireApp.Model.AppUser", "Viewer")
-                        .WithMany()
-                        .HasForeignKey("ViewedUserCode")
-                        .HasPrincipalKey("UserCode")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Navigation("Cv");
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
 
-                    b.Navigation("Viewer");
-                });
+                    b.Property<string>("Education")
+                        .HasColumnType("nvarchar(max)");
 
-            modelBuilder.Entity("NextHireApp.Model.JobApplication", b =>
-                {
-                    b.HasOne("NextHireApp.Model.Job", "Job")
-                        .WithMany()
-                        .HasForeignKey("JobCode")
-                        .HasPrincipalKey("JobCode")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Property<string>("Experience")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasOne("NextHireApp.Model.AppUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserCode")
-                        .HasPrincipalKey("UserCode")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Navigation("Job");
+                    b.Property<int>("Gender")
+                        .HasColumnType("int");
 
-                    b.Navigation("User");
-                });
+                    b.Property<string>("PersonalProjects")
+                        .HasColumnType("nvarchar(max)");
 
-            modelBuilder.Entity("NextHireApp.Model.UserCV", b =>
-                {
-                    b.HasOne("NextHireApp.Model.AppUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserCode")
-                        .HasPrincipalKey("UserCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<string>("PortfolioUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Navigation("User");
+                    b.Property<string>("SavedJobs")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Skills")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserCode")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("nvarchar(12)");
+
+                    b.HasIndex("UserCode")
+                        .IsUnique()
+                        .HasFilter("[UserCode] IS NOT NULL");
+
+                    b.ToTable("AppUsers", (string)null);
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLogAction", b =>
@@ -2588,6 +2489,15 @@ namespace NextHireApp.Migrations
                     b.HasOne("Volo.Abp.TenantManagement.Tenant", null)
                         .WithMany("ConnectionStrings")
                         .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NextHireApp.Model.AppUser", b =>
+                {
+                    b.HasOne("Volo.Abp.Identity.IdentityUser", null)
+                        .WithOne()
+                        .HasForeignKey("NextHireApp.Model.AppUser", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

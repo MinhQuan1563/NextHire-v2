@@ -16,10 +16,12 @@
 - Do NOT depend on EF Core directly.
 
 ### EntityFrameworkCore Layer
-- Configure `DbContext` (inherits from `AbpDbContext`).
 - Implement repository interfaces defined in Domain layer.
 - Register entities via `DbSet<TEntity>`.
 - Keep persistence concerns here only.
+- When coding **Repositories**:
+  - If a method only **reads data** ⇒ use `INextHireAppReadDbContext`.
+  - If a method **modifies data** (insert/update/delete) ⇒ use `INextHireAppDbContext`.
 ### Application.Contracts Layer
 - Define **DTOs** for input/output.
 - Define **Service Interfaces** (e.g., `IUserAppService : IApplicationService`).

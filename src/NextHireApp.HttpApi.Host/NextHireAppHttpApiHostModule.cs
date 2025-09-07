@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NextHireApp.EntityFrameworkCore;
+using NextHireApp.Localization;
 using NextHireApp.MultiTenancy;
 using OpenIddict.Validation.AspNetCore;
 using System;
@@ -24,10 +25,13 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
+using Volo.Abp.Localization;
+using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.Modularity;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
+using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
 
 namespace NextHireApp;
@@ -71,6 +75,10 @@ public class NextHireAppHttpApiHostModule : AbpModule
         ConfigureNoMvc(context);
 
         #region Localization
+        Configure<AbpExceptionLocalizationOptions>(options =>
+        {
+            options.MapCodeNamespace("NextHire", typeof(NextHireAppResource));
+        });
         #endregion
     }
 

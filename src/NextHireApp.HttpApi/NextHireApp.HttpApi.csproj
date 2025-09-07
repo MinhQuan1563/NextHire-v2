@@ -10,15 +10,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NextHireApp.Application.Contracts\NextHireApp.Application.Contracts.csproj" />
+    <ProjectReference Include="..\NextHireApp.EntityFrameworkCore\NextHireApp.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Account.HttpApi" Version="9.2.3" />
-    <PackageReference Include="Volo.Abp.Identity.HttpApi" Version="9.2.3" />
-    <PackageReference Include="Volo.Abp.PermissionManagement.HttpApi" Version="9.2.3" />
-    <PackageReference Include="Volo.Abp.TenantManagement.HttpApi" Version="9.2.3" />
-    <PackageReference Include="Volo.Abp.FeatureManagement.HttpApi" Version="9.2.3" />
-    <PackageReference Include="Volo.Abp.SettingManagement.HttpApi" Version="9.2.3" />
+    <PackageReference Include="Volo.Abp.Account.HttpApi" Version="9.3.2" />
+    <PackageReference Include="Volo.Abp.Identity.HttpApi" Version="9.3.2" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.HttpApi" Version="9.3.2" />
+    <PackageReference Include="Volo.Abp.TenantManagement.HttpApi" Version="9.3.2" />
+    <PackageReference Include="Volo.Abp.FeatureManagement.HttpApi" Version="9.3.2" />
+    <PackageReference Include="Volo.Abp.SettingManagement.HttpApi" Version="9.3.2" />
   </ItemGroup>
 
 </Project>
