@@ -4,6 +4,16 @@
     "AppName": "NextHireApp",
     "Menu:Home": "Home",
     "Welcome": "Welcome",
-    "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information, visit abp.io."
+    "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information, visit abp.io.",
+    "NextHire:N001": "Create Company Failed",
+    "NextHire:N002": "{api_name} not response",
+    "NextHire:N003": "Mã số thuế không hợp lệ.",
+    "NextHire:N004": "Không tìm thấy thông tin mã số thuế.",
+    "NextHire:N005": "Xác thực mã số thuế thất bại.",
+    "NextHire:N006": "Industry value is invalid.",
+    "NextHire:N007": "User Not found",
+    "NextHire:N008": "Update company failed because {err}",
+    "NextHire:N009": "Company không tồn tại",
+    "NextHire:N010": "Status không hợp lệ"
   }
 }

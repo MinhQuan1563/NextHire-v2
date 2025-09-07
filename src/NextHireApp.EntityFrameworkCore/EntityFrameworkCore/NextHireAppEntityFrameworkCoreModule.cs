@@ -42,6 +42,12 @@ public class NextHireAppEntityFrameworkCoreModule : AbpModule
                  * default repositories only for aggregate roots */
             options.AddDefaultRepositories(includeAllEntities: true);
         });
+        context.Services.AddAbpDbContext<NextHireAppReadDbContext>(options =>
+        {
+            /* Remove "includeAllEntities: true" to create
+             * default repositories only for aggregate roots */
+            options.AddDefaultRepositories(includeAllEntities: true);
+        });
 
         Configure<AbpDbContextOptions>(options =>
         {
