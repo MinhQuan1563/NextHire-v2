@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 using System;
+using System.Reflection;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -38,6 +39,29 @@ public class Program
             builder.Host.AddAppSettingsSecretsJson()
                 .UseAutofac()
                 .UseSerilog();
+
+#if DEBUG
+            AppDomain.CurrentDomain.AssemblyLoad += (s, e) =>
+            {
+                try
+                {
+                    _ = e.LoadedAssembly.GetTypes();
+                }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    Console.WriteLine($"[TypeLoadErr] {e.LoadedAssembly.FullName}");
+                    foreach (var le in ex.LoaderExceptions)
+                    {
+                        Console.WriteLine("  -> " + le?.Message);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[AsmErr] {e.LoadedAssembly.FullName}: {ex.Message}");
+                }
+            };
+#endif
+
             await builder.AddApplicationAsync<NextHireAppHttpApiHostModule>();
             var app = builder.Build();
             await app.InitializeApplicationAsync();

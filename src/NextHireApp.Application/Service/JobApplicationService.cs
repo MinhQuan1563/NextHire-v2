@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using NextHireApp;
-using NextHireApp.Dtos;
 using NextHireApp.JobApplications;
 using NextHireApp.Model;
 using NextHireApp.Repository;
