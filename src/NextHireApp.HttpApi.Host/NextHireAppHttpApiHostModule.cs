@@ -1,9 +1,11 @@
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NextHireApp.EntityFrameworkCore;
 using NextHireApp.MultiTenancy;
@@ -24,7 +26,10 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
+using Volo.Abp.BlobStoring;
+using Volo.Abp.Http.Client;
 using Volo.Abp.Modularity;
+using Volo.Abp.OpenIddict;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
@@ -40,8 +45,10 @@ namespace NextHireApp;
     typeof(NextHireAppEntityFrameworkCoreModule),
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
     typeof(AbpAccountWebOpenIddictModule),
+    typeof(AbpOpenIddictAspNetCoreModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(AbpHttpClientModule)
 )]
 public class NextHireAppHttpApiHostModule : AbpModule
 {
@@ -69,8 +76,26 @@ public class NextHireAppHttpApiHostModule : AbpModule
         ConfigureConventionalControllers();
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
-        ConfigureSwaggerServices(context, configuration);
+        ConfigureSwaggerServices(context, configuration); // OAuth2 PKCE
         ConfigureNoMvc(context);
+        
+        // // JWT
+        // context.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        //     .AddJwtBearer(options =>
+        //{
+        //        options.Authority = configuration["AuthServer:Authority"];
+        //        options.RequireHttpsMetadata = bool.Parse(configuration["AuthServer:RequireHttpsMetadata"] ?? "true");
+
+        //        // Khớp audience = scope (resource)
+        //        options.Audience = configuration["AuthServer:Scope"];
+        //        options.TokenValidationParameters = new TokenValidationParameters
+        //        {
+        //            ValidateIssuer = true,
+        //            ValidateAudience = true,
+        //            ValidateLifetime = true,
+        //            ClockSkew = TimeSpan.Zero
+        //        };
+        //    });
 
         #region Localization
         #endregion
@@ -91,6 +116,17 @@ public class NextHireAppHttpApiHostModule : AbpModule
         {
             options.IsDynamicClaimsEnabled = true;
         });
+
+        var auth = context.Services.GetConfiguration().GetSection("AuthServer");
+        Configure<AbpRemoteServiceOptions>(opts => { opts.RemoteServices.Default = new RemoteServiceConfiguration(auth["Authority"]); });
+
+        context.Services.AddAuthentication()
+            .AddJwtBearer("Bearer", options =>
+            {
+                options.Authority = auth["Authority"];
+                options.RequireHttpsMetadata = bool.Parse(auth["RequireHttpsMetadata"] ?? "true");
+                options.Audience = auth["Audience"];
+            });
     }
 
     private void ConfigureBundles()
@@ -153,19 +189,58 @@ public class NextHireAppHttpApiHostModule : AbpModule
 
     private static void ConfigureSwaggerServices(ServiceConfigurationContext context, IConfiguration configuration)
     {
-        context.Services.AddAbpSwaggerGenWithOAuth(
-            configuration["AuthServer:Authority"]!,
-            new Dictionary<string, string>
+        //context.Services.AddAbpSwaggerGenWithOAuth(
+        //    configuration["AuthServer:Authority"]!,
+        //    new Dictionary<string, string>
+        //    {
+        //            {"NextHireApp", "NextHireApp API"}
+        //    },
+        //    options =>
+        //    {
+        //        options.SwaggerDoc("v1", new OpenApiInfo { Title = "NextHireApp API", Version = "v1" });
+        //        options.DocInclusionPredicate((docName, description) => true);
+        //        options.CustomSchemaIds(type => type.FullName);
+        //        options.HideAbpEndpoints();
+        //    });
+
+        context.Services.AddSwaggerGen(opt =>
+        {
+            opt.SwaggerDoc("v1", new OpenApiInfo { Title = "NextHireApp API", Version = "v1" });
+            opt.DocInclusionPredicate((_, __) => true);
+            opt.CustomSchemaIds(t => t.FullName);
+            opt.HideAbpEndpoints();
+
+            var authority = configuration["AuthServer:Authority"];
+
+            opt.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
             {
-                    {"NextHireApp", "NextHireApp API"}
-            },
-            options =>
-            {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "NextHireApp API", Version = "v1" });
-                options.DocInclusionPredicate((docName, description) => true);
-                options.CustomSchemaIds(type => type.FullName);
-                options.HideAbpEndpoints();
+                Type = SecuritySchemeType.OAuth2,
+                Flows = new OpenApiOAuthFlows
+                {
+                    AuthorizationCode = new OpenApiOAuthFlow
+                    {
+                        AuthorizationUrl = new Uri($"{authority}/connect/authorize"),
+                        TokenUrl = new Uri($"{authority}/connect/token"),
+                        Scopes = new Dictionary<string, string>
+                    {
+                        { "NextHireApp", "NextHireApp API" }
+                    }
+                    }
+                }
             });
+
+            opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "oauth2" }
+                },
+                new[] { "NextHireApp" }
+            }
+        });
+        });
+
     }
 
     private void ConfigureCors(ServiceConfigurationContext context, IConfiguration configuration)
@@ -226,7 +301,8 @@ public class NextHireAppHttpApiHostModule : AbpModule
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "NextHireApp API");
 
             var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
-            c.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
+            c.OAuthClientId(configuration["AuthServer:SwaggerClientId"] ?? "NextHireApp_Swagger");
+            c.OAuthUsePkce(); // PKCE 
             c.OAuthScopes("NextHireApp");
             c.DefaultModelsExpandDepth(-1);
         });
