@@ -84,43 +84,7 @@ namespace NextHireApp.EntityFrameworkCore
                 b.Property(x => x.JobCode).HasMaxLength(12);
                 b.Property(x => x.Title).HasMaxLength(50);
             });
-
-
-            // JobApplication
-            builder.Entity<JobApplication>(b =>
-            {
-                b.ToTable("JobApplications");
-                b.HasKey(x => x.ApplicationId);
-                b.HasIndex(x => x.ApplicationCode).IsUnique();
-                b.Property(x => x.ApplicationCode).HasMaxLength(12);
-            });
-
-
-            // CVTemplate
-            builder.Entity<CVTemplate>(b =>
-            {
-                b.ToTable("CVTemplates");
-                b.HasKey(x => x.TemplateId);
-                b.HasIndex(x => x.TemplateCode).IsUnique();
-                b.Property(x => x.TemplateCode).HasMaxLength(12);
-            });
-
-
-            // UserCV
-            builder.Entity<UserCV>(b =>
-            {
-                b.ToTable("UserCVs");
-                b.HasKey(x => x.CvId);
-            });
-
-
-            // CvView
-            builder.Entity<CvView>(b =>
-            {
-                b.ToTable("CvViews");
-                b.HasKey(x => x.ViewId);
-            });
-
+            builder.ConfigureCvAndJobApplication();
             // Post
             builder.Entity<Post>(b =>
             {

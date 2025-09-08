@@ -17,5 +17,7 @@ namespace NextHireApp.Model
         public string? AttachmentFile { get; set; }
         public int Status { get; set; }
         public int JobApplicateVersion { get; set; }
+        public virtual AppUser? User { get; set; }
+        public virtual Job? Job { get; set; }
     }
 }

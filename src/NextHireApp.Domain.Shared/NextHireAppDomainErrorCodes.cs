@@ -15,4 +15,18 @@ public static class NextHireAppDomainErrorCodes
     public static readonly string UpdateCompanyFailed = "NextHire:N008";
     public static readonly string CompanyNotFound = "NextHire:N009";
     public static readonly string StatusInvalid = "NextHire:N010";
+
+    // JobApplication 
+    public static readonly string CvFileTooLarge = "NextHire:JA001";
+    public static readonly string CoverLetterFileTooLarge = "NextHire:JA002";
+    public static readonly string AttachmentFileTooLarge = "NextHire:JA003";
+    public static readonly string AppliedJobNotFound = "NextHire:JA004";
+    public static readonly string MissedJobDeadline = "NextHire:JA005";
+    public static readonly string JobApplicationNotFound = "NextHire:JA006";
+    public static readonly string UserNotAuthorized = "NextHire:JA007";
+    public static readonly string CannotCancelProcessedApplication = "NextHire:JA008";
+    public static readonly string InvalidJobApplicationStatus = "NextHire:JA009";
+    public static readonly string UserAlreadyApplyToJobs = "NextHire:JA010";
+    public static readonly string InvalidFileType = "NextHire:JA011";
+
 }

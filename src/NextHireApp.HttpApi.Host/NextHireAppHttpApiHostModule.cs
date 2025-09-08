@@ -68,10 +68,8 @@ public class NextHireAppHttpApiHostModule : AbpModule
         var hostingEnvironment = context.Services.GetHostingEnvironment();
 
         ConfigureAuthentication(context);
-        ConfigureBundles();
         ConfigureUrls(configuration);
         ConfigureConventionalControllers();
-        ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
         ConfigureNoMvc(context);
@@ -101,20 +99,6 @@ public class NextHireAppHttpApiHostModule : AbpModule
         });
     }
 
-    private void ConfigureBundles()
-    {
-        Configure<AbpBundlingOptions>(options =>
-        {
-            options.StyleBundles.Configure(
-                LeptonXLiteThemeBundles.Styles.Global,
-                bundle =>
-                {
-                    bundle.AddFiles("/global-styles.css");
-                }
-            );
-        });
-    }
-
     private void ConfigureUrls(IConfiguration configuration)
     {
         Configure<AppUrlOptions>(options =>
@@ -127,35 +111,14 @@ public class NextHireAppHttpApiHostModule : AbpModule
         });
     }
 
-    private void ConfigureVirtualFileSystem(ServiceConfigurationContext context)
-    {
-        var hostingEnvironment = context.Services.GetHostingEnvironment();
-
-        if (hostingEnvironment.IsDevelopment())
-        {
-            Configure<AbpVirtualFileSystemOptions>(options =>
-            {
-                options.FileSets.ReplaceEmbeddedByPhysical<NextHireAppDomainSharedModule>(
-                    Path.Combine(hostingEnvironment.ContentRootPath,
-                        $"..{Path.DirectorySeparatorChar}NextHireApp.Domain.Shared"));
-                options.FileSets.ReplaceEmbeddedByPhysical<NextHireAppDomainModule>(
-                    Path.Combine(hostingEnvironment.ContentRootPath,
-                        $"..{Path.DirectorySeparatorChar}NextHireApp.Domain"));
-                options.FileSets.ReplaceEmbeddedByPhysical<NextHireAppApplicationContractsModule>(
-                    Path.Combine(hostingEnvironment.ContentRootPath,
-                        $"..{Path.DirectorySeparatorChar}NextHireApp.Application.Contracts"));
-                options.FileSets.ReplaceEmbeddedByPhysical<NextHireAppApplicationModule>(
-                    Path.Combine(hostingEnvironment.ContentRootPath,
-                        $"..{Path.DirectorySeparatorChar}NextHireApp.Application"));
-            });
-        }
-    }
-
     private void ConfigureConventionalControllers()
     {
         Configure<AbpAspNetCoreMvcOptions>(options =>
         {
-            options.ConventionalControllers.Create(typeof(NextHireAppApplicationModule).Assembly);
+            //options.ConventionalControllers.Create(typeof(NextHireAppApplicationModule).Assembly);
+            options.ConventionalControllers.Create(typeof(NextHireAppHttpApiModule).Assembly);
+
+
         });
     }
 

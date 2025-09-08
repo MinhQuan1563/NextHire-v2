@@ -13,5 +13,8 @@ namespace NextHireApp.Model
         public string CvName { get; set; } = default!;
         public string FileCv { get; set; } = default!;
         public DateTime CreatedAt { get; set; }
+        public bool IsDefault { get; set; } = false;
+        public int Version { get; set; } = 1;
+        public virtual AppUser? User { get; set; }
     }
 }
