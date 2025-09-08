@@ -1,8 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using OpenIddict.Abstractions;
+﻿using OpenIddict.Abstractions;
 using System;
 using System.Threading.Tasks;
-using Volo.Abp;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 
@@ -12,39 +10,25 @@ namespace NextHireApp.DbMigrator.OpenIddict
     {
         private readonly IOpenIddictApplicationManager _appManager;
         private readonly IOpenIddictScopeManager _scopeManager;
-        private readonly IConfiguration _configuration;
 
         public OpenIddictDataSeedContributor(
             IOpenIddictApplicationManager appManager,
-            IOpenIddictScopeManager scopeManager,
-            IConfiguration configuration)
+            IOpenIddictScopeManager scopeManager)
         {
             _appManager = appManager;
             _scopeManager = scopeManager;
-            _configuration = configuration;
         }
 
         public async Task SeedAsync(DataSeedContext context)
         {
-            //var loginRedirectUri = _configuration["AuthServer:LoginRedirectUri"];
-            //var logoutRedirectUri = _configuration["AuthServer:LogoutRedirectUri"];
-            //var clientId = _configuration["AuthServer:SwaggerClientId"];
-            //var clientSecret = _configuration["AuthServer:SwaggerClientSecret"];
-            //var scope = _configuration["AuthServer:Scope"];
-
-            //if (string.IsNullOrEmpty(loginRedirectUri) || string.IsNullOrEmpty(scope)
-            //    || string.IsNullOrEmpty(logoutRedirectUri) || string.IsNullOrEmpty(clientId))
-            //{
-            //    throw new BusinessException("Auth:ConfigurationMissing");
-            //}
-
             // 1) API Scope
             if (await _scopeManager.FindByNameAsync("NextHireApp") is null)
             {
                 await _scopeManager.CreateAsync(new OpenIddictScopeDescriptor
                 {
                     Name = "NextHireApp",
-                    DisplayName = "NextHireApp API"
+                    DisplayName = "NextHireApp API",
+                    Resources = { "NextHireApp" }
                 });
             }
 
