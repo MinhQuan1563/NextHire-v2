@@ -115,7 +115,10 @@ public class NextHireAppHttpApiHostModule : AbpModule
     {
         Configure<AbpAspNetCoreMvcOptions>(options =>
         {
-            options.ConventionalControllers.Create(typeof(NextHireAppApplicationModule).Assembly);
+            //options.ConventionalControllers.Create(typeof(NextHireAppApplicationModule).Assembly);
+            options.ConventionalControllers.Create(typeof(NextHireAppHttpApiModule).Assembly);
+
+
         });
     }
 

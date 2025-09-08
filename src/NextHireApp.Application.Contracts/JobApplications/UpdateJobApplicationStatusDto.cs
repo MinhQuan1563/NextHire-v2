@@ -6,13 +6,9 @@ using System.Threading.Tasks;
 
 namespace NextHireApp.JobApplications
 {
-    public enum ApplicationStatus
+    public class UpdateJobApplicationStatusDto
     {
-        Applied = 0,
-        Reviewed = 1,
-        Interviewed = 2,
-        Rejected = 3,
-        Hired = 4,
-        Cancelled = 5,
+        public string ApplicationCode { get; set; } = default!;
+        public int Status { get; set; }
     }
 }

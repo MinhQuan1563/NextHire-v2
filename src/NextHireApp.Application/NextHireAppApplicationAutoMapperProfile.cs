@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using NextHireApp.Dtos;
+using NextHireApp.JobApplications;
 using NextHireApp.Model;
 
 namespace NextHireApp;
@@ -30,6 +31,10 @@ public class NextHireAppApplicationAutoMapperProfile : Profile
             .ForMember(dest => dest.LogoUrl, opt => opt.MapFrom(src => src.LogoUrl))
             .ForMember(dest => dest.Website, opt => opt.MapFrom(src => src.Website));
 
+        // JobApplication mappings
+        CreateMap<CreateJobApplicationDto,JobApplication>();
+        CreateMap<JobApplication, JobApplicationDto>();
+        CreateMap<JobApplication, JobApplicationDetailDto>();
 
     }
 }
