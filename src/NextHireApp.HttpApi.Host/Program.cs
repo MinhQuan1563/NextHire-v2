@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace NextHireApp;
@@ -22,14 +23,18 @@ public class Program
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
             .Enrich.FromLogContext()
-            .WriteTo.Async(c => c.File("Logs/logs.txt"))
+            //.WriteTo.Async(c => c.File("Logs/logs.txt"))
             .WriteTo.Async(c => c.Console())
             .CreateLogger();
 
         try
         {
             Log.Information("Starting NextHireApp.HttpApi.Host.");
-            var builder = WebApplication.CreateBuilder(args);
+            var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+            {
+                ContentRootPath = Directory.GetCurrentDirectory(),
+                WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")
+            });
             builder.Host.AddAppSettingsSecretsJson()
                 .UseAutofac()
                 .UseSerilog();

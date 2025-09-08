@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NextHireApp.Model;
-using System;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -53,7 +52,6 @@ public class NextHireAppDbContext :
     // Tenant Management
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
-
     #endregion
     public DbSet<AppUser> AppUsers { get; set; }
     public DbSet<Company> Companies { get; set; }
@@ -71,7 +69,6 @@ public class NextHireAppDbContext :
     public DbSet<GameScore> GameScores { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<ErrorLog> ErrorLogs { get; set; }
-
     public NextHireAppDbContext(DbContextOptions<NextHireAppDbContext> options)
         : base(options)
     {
@@ -92,15 +89,14 @@ public class NextHireAppDbContext :
         builder.ConfigureOpenIddict();
         builder.ConfigureFeatureManagement();
         builder.ConfigureTenantManagement();
-
         /* Configure your own tables/entities inside here */
         builder.Entity<AppUser>(b =>
-        {
-            b.ToTable("AppUser");
-            b.HasKey(u => u.Id);
-            b.Property(u => u.UserCode).HasMaxLength(12).IsRequired();
-            b.HasIndex(u => u.UserCode).IsUnique();
-        });
+       {
+           b.ToTable("AppUser");
+           b.HasKey(u => u.Id);
+           b.Property(u => u.UserCode).HasMaxLength(12).IsRequired();
+           b.HasIndex(u => u.UserCode).IsUnique();
+       });
 
         builder.Entity<Company>(b =>
         {
@@ -122,40 +118,7 @@ public class NextHireAppDbContext :
         });
 
 
-        // JobApplication
-        builder.Entity<JobApplication>(b =>
-        {
-            b.ToTable("JobApplications");
-            b.HasKey(x => x.ApplicationId);
-            b.HasIndex(x => x.ApplicationCode).IsUnique();
-            b.Property(x => x.ApplicationCode).HasMaxLength(12);
-        });
-
-
-        // CVTemplate
-        builder.Entity<CVTemplate>(b =>
-        {
-            b.ToTable("CVTemplates");
-            b.HasKey(x => x.TemplateId);
-            b.HasIndex(x => x.TemplateCode).IsUnique();
-            b.Property(x => x.TemplateCode).HasMaxLength(12);
-        });
-
-
-        // UserCV
-        builder.Entity<UserCV>(b =>
-        {
-            b.ToTable("UserCVs");
-            b.HasKey(x => x.CvId);
-        });
-
-
-        // CvView
-        builder.Entity<CvView>(b =>
-        {
-            b.ToTable("CvViews");
-            b.HasKey(x => x.ViewId);
-        });
+        builder.ConfigureCvAndJobApplication();
 
         // Post
         builder.Entity<Post>(b =>
