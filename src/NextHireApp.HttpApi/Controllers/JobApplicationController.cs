@@ -25,8 +25,8 @@ namespace NextHireApp.Controllers
         /// <summary>
         /// Lây  chi tiết ưng tuyển
         /// </summary>
-        [HttpGet]
-        public async Task<ActionResult<JobApplicationDetailDto>> GetJobApplicationDetailByCodeAsync([FromQuery] string applicationCode)
+        [HttpGet("{applicationCode}")]
+        public async Task<ActionResult<JobApplicationDetailDto>> GetJobApplicationDetailByCodeAsync([FromRoute] string applicationCode)
         {
             var result = await _service.GetJobApplicationDetailByCodeAsync(applicationCode);
             return Ok(result);

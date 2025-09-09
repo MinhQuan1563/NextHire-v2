@@ -29,4 +29,11 @@ public static class NextHireAppDomainErrorCodes
     public static readonly string UserAlreadyApplyToJobs = "NextHire:JA010";
     public static readonly string InvalidFileType = "NextHire:JA011";
 
+    // UserCv
+    public static readonly string FileRequired = "NextHire:UCV001";
+    public static readonly string CvNotFound = "NextHire:UCV002";
+
+
+
+
 }
