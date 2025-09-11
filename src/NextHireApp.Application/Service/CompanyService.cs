@@ -105,7 +105,10 @@ namespace NextHireApp.Services
         public async Task<SearchCompanyDTO?> GetCompanyByTaxCode(string taxCode)
         {
             var res = await _companyRepository.GetCompanyByTaxCode(taxCode);
-            if (res == null) return null;
+            if (res == null)
+            {
+                throw new BusinessException(NextHireAppDomainErrorCodes.CompanyNotFound);
+            }
             return new SearchCompanyDTO
             {
                 CompanyName = res.CompanyName,
