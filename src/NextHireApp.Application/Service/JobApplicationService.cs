@@ -41,7 +41,7 @@ namespace NextHireApp.Service
             var isUserExist = await _appUserRepository.IsExists(input.UserCode);
             if (!isUserExist)
             {
-                throw new BusinessException(NextHireAppDomainErrorCodes.UserNotFound);
+                throw new UserFriendlyException(NextHireAppDomainErrorCodes.UserNotFound);
             }
             // Kiểm tra Job tồn tại chưa && quá hạn chưa
             var job = await _jobRepository.GetJobByCodeAsync(input.JobCode);

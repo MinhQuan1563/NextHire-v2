@@ -2,6 +2,7 @@
 using NextHireApp.Dtos;
 using NextHireApp.JobApplications;
 using NextHireApp.Model;
+using NextHireApp.UserCVs;
 
 namespace NextHireApp;
 
@@ -35,6 +36,12 @@ public class NextHireAppApplicationAutoMapperProfile : Profile
         CreateMap<CreateJobApplicationDto,JobApplication>();
         CreateMap<JobApplication, JobApplicationDto>();
         CreateMap<JobApplication, JobApplicationDetailDto>();
+
+        //UserCV
+        CreateMap<UserCV, UserCvDto>();
+        CreateMap<UserCV, UserCvDetailDto>();
+        CreateMap<CreateUserCvDto, UserCV>();
+        CreateMap<UpdateUserCvDto, UserCV>();
 
     }
 }
