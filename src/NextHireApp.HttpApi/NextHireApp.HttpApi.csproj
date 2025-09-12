@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NextHireApp.Application.Contracts\NextHireApp.Application.Contracts.csproj" />
+    <ProjectReference Include="..\NextHireApp.EntityFrameworkCore\NextHireApp.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

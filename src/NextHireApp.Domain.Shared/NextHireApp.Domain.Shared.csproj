@@ -22,7 +22,10 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Localization\NextHireApp\*.json" />
+    <Compile Remove="Enums\**" />
     <Content Remove="Localization\NextHireApp\*.json" />
+    <EmbeddedResource Remove="Enums\**" />
+    <None Remove="Enums\**" />
   </ItemGroup>
 
   <ItemGroup>

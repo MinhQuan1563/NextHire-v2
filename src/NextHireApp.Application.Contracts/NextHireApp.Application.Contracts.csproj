@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NextHireApp.Domain.Shared\NextHireApp.Domain.Shared.csproj" />
+    <ProjectReference Include="..\NextHireApp.Domain\NextHireApp.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
