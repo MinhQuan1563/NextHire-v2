@@ -68,5 +68,3 @@ Thumbs.db
 .vscode/
 *.swp
 *.tmp
-publish
-publish/*

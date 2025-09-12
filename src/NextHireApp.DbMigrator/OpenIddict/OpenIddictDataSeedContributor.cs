@@ -32,7 +32,7 @@ namespace NextHireApp.DbMigrator.OpenIddict
                 });
             }
 
-            // 2) Swagger (Authorization Code + PKCE)
+            // 2) Swagger client (Authorization Code + PKCE, no secret)
             if (await _appManager.FindByClientIdAsync("NextHireApp_Swagger") is null)
             {
                 await _appManager.CreateAsync(new OpenIddictApplicationDescriptor
@@ -40,7 +40,7 @@ namespace NextHireApp.DbMigrator.OpenIddict
                     ClientId = "NextHireApp_Swagger",
                     DisplayName = "Swagger UI",
                     ClientType = OpenIddictConstants.ClientTypes.Public, // PKCE => Public
-                    ConsentType = OpenIddictConstants.ConsentTypes.Explicit,
+                    ConsentType = OpenIddictConstants.ConsentTypes.Implicit,
                     RedirectUris =
                     {
                         new Uri("https://localhost:44396/swagger/oauth2-redirect.html")
@@ -57,14 +57,12 @@ namespace NextHireApp.DbMigrator.OpenIddict
                         // flows
                         OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
                         OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
-                        // response types
-                        OpenIddictConstants.Permissions.ResponseTypes.Code,
                         // scopes
-                        OpenIddictConstants.Permissions.Prefixes.Scope + OpenIddictConstants.Scopes.OpenId,
-                        OpenIddictConstants.Permissions.Prefixes.Scope + OpenIddictConstants.Scopes.Profile,
-                        OpenIddictConstants.Permissions.Prefixes.Scope + OpenIddictConstants.Scopes.Email,
-                        OpenIddictConstants.Permissions.Prefixes.Scope + OpenIddictConstants.Scopes.OfflineAccess,
-                        OpenIddictConstants.Permissions.Prefixes.Scope + "NextHireApp",
+                        OpenIddictConstants.Permissions.Scopes.Profile,
+                        OpenIddictConstants.Permissions.Scopes.Email,
+                        "NextHireApp",
+                        // response types
+                        OpenIddictConstants.Permissions.ResponseTypes.Code
                     },
                     Requirements =
                     {
@@ -96,7 +94,7 @@ namespace NextHireApp.DbMigrator.OpenIddict
             //        OpenIddictConstants.Permissions.Endpoints.Token,
             //        OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
             //        OpenIddictConstants.Permissions.ResponseTypes.Code,
-            //        "NextHireApp", OpenIddictConstants.Scopes.Profile, OpenIddictConstants.Scopes.Email
+            //        "NextHireApp", OpenIddictConstants.Permissions.Scopes.Profile, OpenIddictConstants.Permissions.Scopes.Email
             //    },
             //        Requirements =
             //    {
@@ -106,11 +104,11 @@ namespace NextHireApp.DbMigrator.OpenIddict
             //}
 
             // 4) Password Flow client (for direct username/password login)
-            if (await _appManager.FindByClientIdAsync("NextHireApp_Password") is null)
+            if (await _appManager.FindByClientIdAsync("NextHireApp_PasswordFlow") is null)
             {
                 await _appManager.CreateAsync(new OpenIddictApplicationDescriptor
                 {
-                    ClientId = "NextHireApp_Password",
+                    ClientId = "NextHireApp_PasswordFlow",
                     ClientSecret = "secret123!",
                     DisplayName = "Password Flow Client",
                     ClientType = OpenIddictConstants.ClientTypes.Confidential,
@@ -122,11 +120,9 @@ namespace NextHireApp.DbMigrator.OpenIddict
                         OpenIddictConstants.Permissions.GrantTypes.Password,
                         OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
                         // scopes
-                        OpenIddictConstants.Permissions.Prefixes.Scope + OpenIddictConstants.Scopes.OpenId,
-                        OpenIddictConstants.Permissions.Prefixes.Scope + OpenIddictConstants.Scopes.Profile,
-                        OpenIddictConstants.Permissions.Prefixes.Scope + OpenIddictConstants.Scopes.Email,
-                        OpenIddictConstants.Permissions.Prefixes.Scope + OpenIddictConstants.Scopes.OfflineAccess,
-                        OpenIddictConstants.Permissions.Prefixes.Scope + "NextHireApp",
+                        "NextHireApp",
+                        OpenIddictConstants.Permissions.Scopes.Profile,
+                        OpenIddictConstants.Permissions.Scopes.Email
                     }
                 });
             }

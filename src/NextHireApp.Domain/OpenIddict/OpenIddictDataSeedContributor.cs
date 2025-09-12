@@ -79,6 +79,11 @@ public class OpenIddictDataSeedContributor : IDataSeedContributor, ITransientDep
 
         var configurationSection = _configuration.GetSection("OpenIddict:Applications");
 
+
+
+
+
+
         // Swagger Client
         var swaggerClientId = configurationSection["NextHireApp_Swagger:ClientId"];
         if (!swaggerClientId.IsNullOrWhiteSpace())
