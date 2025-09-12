@@ -11,6 +11,11 @@ namespace NextHireApp.Service
         private readonly IDistributedCache<string> _cache;
         private const string Prefix = "jwt:blacklist:";
 
+        public TokenBlacklistService(IDistributedCache<string> cache)
+        {
+            _cache = cache;
+        }
+
         public Task BlacklistAsync(string jti, TimeSpan ttl) =>
             _cache.SetAsync(Prefix + jti, "1", new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = ttl });
 
