@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using NextHireApp.EntityFrameworkCore;
 using NextHireApp.Localization;
@@ -27,13 +28,13 @@ using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
 using Volo.Abp.BlobStoring;
 using Volo.Abp.Emailing;
+using Volo.Abp.EventBus;
 using Volo.Abp.Http.Client;
 using Volo.Abp.Localization.ExceptionHandling;
 using Volo.Abp.MailKit;
 using Volo.Abp.Modularity;
 using Volo.Abp.OpenIddict;
 using Volo.Abp.Security.Claims;
-using Volo.Abp.Settings;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 
@@ -52,7 +53,8 @@ namespace NextHireApp;
     typeof(AbpSwashbuckleModule),
     typeof(AbpHttpClientModule),
     typeof(AbpMailKitModule),
-    typeof(AbpEmailingModule)
+    typeof(AbpEmailingModule),
+    typeof(AbpEventBusModule)
 )]
 public class NextHireAppHttpApiHostModule : AbpModule
 {

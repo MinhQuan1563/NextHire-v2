@@ -12,6 +12,7 @@
     <ProjectReference Include="..\NextHireApp.Domain\NextHireApp.Domain.csproj" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.8" />
     <PackageReference Include="Volo.Abp.EntityFrameworkCore.SqlServer" Version="9.3.2" />
+    <PackageReference Include="Volo.Abp.EventBus.Distributed" Version="0.7.1" />
     <PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="9.3.2" />
     <PackageReference Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="9.3.2" />
     <PackageReference Include="Volo.Abp.Identity.EntityFrameworkCore" Version="9.3.2" />

@@ -1,5 +1,4 @@
 ﻿using System;
-using Volo.Abp.Identity;
 
 namespace NextHireApp.Model
 {
