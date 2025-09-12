@@ -9,25 +9,35 @@ namespace NextHireApp.Service
 {
     /// <summary>
     /// Dịch vụ xác thực: đăng ký, đăng nhập, reset/đổi mật khẩu.
-    /// Method nào cho phép khách vãng lai thì đánh [AllowAnonymous].
     /// </summary>
     public interface IAuthAppService : IApplicationService
     {
-        /// <summary>Tạo user mới.</summary>
-        [AllowAnonymous]
-        Task RegisterAsync(RegisterDto input);
+        /// <summary>
+        /// Tạo user mới.
+        /// </summary>
+        Task<TokenResponseDto> RegisterAsync(RegisterDto input);
 
-        /// <summary>Đăng nhập và nhận JWT + RefreshToken.</summary>
-        [AllowAnonymous]
-        [DisableAuditing] // không log input/output
-        Task<TokenResponseDto> PasswordLoginAsync(LoginDto input);
+        /// <summary>
+        /// Đăng nhập và nhận JWT + RefreshToken.
+        /// </summary>
+        Task<TokenResponseDto> LoginAsync(LoginDto input);
 
-        /// <summary>Gửi email reset mật khẩu.</summary>
-        [AllowAnonymous]
-        Task RequestPasswordResetAsync([Required, EmailAddress] string email);
+        /// <summary>Làm mới AccessToken bằng RefreshToken.</summary>
+        Task<TokenResponseDto> RefreshAsync(string refreshToken);
 
-        /// <summary>Đổi mật khẩu (yêu cầu đã đăng nhập).</summary>
-        [Authorize]
-        Task ChangePasswordAsync([Required] string current, [Required] string @new);
+        /// <summary>
+        /// Gửi mã đặt lại mật khẩu (reset code) đến email của user.
+        /// </summary>
+        Task SendResetCodeAsync(string email);
+
+        /// <summary>
+        /// Đặt lại mật khẩu bằng reset token đã gửi tới email.
+        /// </summary>
+        Task ResetAsync(string userId, string resetToken, string newPassword);
+
+        /// <summary>
+        /// Đổi mật khẩu khi user đã đăng nhập (cần nhập mật khẩu cũ).
+        /// </summary>
+        Task ChangeAsync(string currentPassword, string newPassword);
     }
 }

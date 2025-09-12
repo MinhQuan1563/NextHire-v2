@@ -1,15 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using NextHireApp.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
 using NextHireApp.JobApplications;
-using NextHireApp.Model;
 using NextHireApp.Service;
 using System;
-using System.Buffers.Text;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
-using Volo.Abp;
 
 namespace NextHireApp.Controllers
 {
